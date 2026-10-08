@@ -1,0 +1,27 @@
+{
+  "name": "gest-scolarite-erp",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@9.12.0",
+  "description": "ERP scolaire professionnel pour les établissements d'enseignement en Côte d'Ivoire",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "test:watch": "pnpm -r test:watch",
+    "format": "prettier --write .",
+    "db:migrate": "pnpm -C apps/api prisma migrate dev",
+    "db:generate": "pnpm -C apps/api prisma generate",
+    "db:seed": "pnpm -C apps/api prisma db seed"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.0",
+    "typescript": "^5.6.3",
+    "ts-node": "^10.9.2"
+  }
+}
