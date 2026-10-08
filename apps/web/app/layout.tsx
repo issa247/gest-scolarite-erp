@@ -2,7 +2,7 @@ import './globals.css';
 
 export const metadata = {
   title: 'GEST-SCOLARITÉ ERP',
-  description: 'ERP scolaire professionnel',
+  description: 'ERP scolaire professionnel en Côte d’Ivoire',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

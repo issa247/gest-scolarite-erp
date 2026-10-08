@@ -1,5 +1,5 @@
 const stats = [
-  { label: 'Élèves', value: '2468' },
+  { label: 'Élèves', value: '2 468' },
   { label: 'Encaissements', value: '1 240 000 XOF' },
   { label: 'Présences', value: '96.4%' },
   { label: 'Impayés', value: '7.3%' },
