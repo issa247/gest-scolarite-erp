@@ -1,0 +1,159 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model School {
+  id          String   @id @default(cuid())
+  name        String
+  shortName   String?
+  countryCode String   @default("CI")
+  currency    String   @default("XOF")
+  timezone    String   @default("Africa/Abidjan")
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users      User[]
+  roles      Role[]
+  students   Student[]
+  classes    SchoolClass[]
+  fees       FeeStructure[]
+}
+
+model User {
+  id           String    @id @default(cuid())
+  schoolId     String
+  email        String
+  passwordHash String
+  firstName    String
+  lastName     String
+  phone        String?
+  active       Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  school     School     @relation(fields: [schoolId], references: [id])
+  roles      UserRole[]
+  auditLogs  AuditLog[]
+  sessions   Session[]
+
+  @@unique([schoolId, email])
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  schoolId    String
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  school      School          @relation(fields: [schoolId], references: [id])
+  permissions RolePermission[]
+  userRoles   UserRole[]
+
+  @@unique([schoolId, name])
+}
+
+model Permission {
+  id          String          @id @default(cuid())
+  key         String          @unique
+  description String?
+  roles       RolePermission[]
+}
+
+model RolePermission {
+  id           String @id @default(cuid())
+  roleId       String
+  permissionId String
+
+  role        Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission  Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+}
+
+model UserRole {
+  id        String   @id @default(cuid())
+  userId    String
+  roleId    String
+  schoolId  String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  refreshToken String?
+  tokenVersion Int      @default(0)
+  ipAddress    String?
+  userAgent    String?
+  revoked      Boolean  @default(false)
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Student {
+  id        String   @id @default(cuid())
+  schoolId  String
+  firstName String
+  lastName  String
+  matricule String
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  school School @relation(fields: [schoolId], references: [id])
+
+  @@unique([schoolId, matricule])
+}
+
+model SchoolClass {
+  id        String   @id @default(cuid())
+  schoolId  String
+  name      String
+  level     String
+  capacity  Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  school School @relation(fields: [schoolId], references: [id])
+}
+
+model FeeStructure {
+  id          String   @id @default(cuid())
+  schoolId    String
+  name        String
+  amount      Decimal  @db.Decimal(10, 2)
+  effectiveAt DateTime
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  school School @relation(fields: [schoolId], references: [id])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  schoolId  String?
+  userId    String?
+  action    String
+  resource  String?
+  details   Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
