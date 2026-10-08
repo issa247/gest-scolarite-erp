@@ -13,7 +13,6 @@
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
-    "test:watch": "pnpm -r test:watch",
     "format": "prettier --write .",
     "db:migrate": "pnpm -C apps/api prisma migrate dev",
     "db:generate": "pnpm -C apps/api prisma generate",

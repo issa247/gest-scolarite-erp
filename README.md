@@ -10,7 +10,7 @@ Monorepo ERP scolaire professionnel pour les établissements d'enseignement en C
 - Packages partagés: contracts, validation, permissions, utils
 - Sécurité: JWT, RBAC, validation des entrées, contrôle d’accès côté serveur
 
-## Pré-requis
+## Prérequis
 - Node.js 20+
 - pnpm 9+
 - PostgreSQL 16+
