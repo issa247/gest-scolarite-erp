@@ -9,7 +9,17 @@ export class SchoolsService {
     return this.prisma.school.findMany();
   }
 
-  async create(data: { name: string; shortName?: string; countryCode?: string }) {
+  async findOne(id: string) {
+    return this.prisma.school.findUnique({
+      where: { id },
+    });
+  }
+
+  async create(data: {
+    name: string;
+    shortName?: string;
+    countryCode?: string;
+  }) {
     return this.prisma.school.create({
       data: {
         name: data.name,

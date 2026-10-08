@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { SchoolsService } from './schools.service';
 
@@ -10,6 +10,11 @@ export class SchoolsController {
   @Get()
   async findAll() {
     return this.schoolsService.findAll();
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.schoolsService.findOne(id);
   }
 
   @Post()

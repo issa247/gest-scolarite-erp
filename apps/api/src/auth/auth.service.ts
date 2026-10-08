@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { compare, hash } from 'bcryptjs';
+import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -13,14 +13,12 @@ export class AuthService {
   async validateUser(email: string, password: string) {
     const user = await this.prisma.user.findFirst({
       where: { email },
-      include: {
-        roles: { include: { role: true } },
-      },
+      include: { roles: { include: { role: true } } },
     });
 
     if (!user) return null;
 
-    const isPasswordValid = await compare(password, user.passwordHash);
+    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) return null;
 
     return {
@@ -36,16 +34,14 @@ export class AuthService {
   async login(email: string, password: string) {
     const user = await this.prisma.user.findFirst({
       where: { email },
-      include: {
-        roles: { include: { role: true } },
-      },
+      include: { roles: { include: { role: true } } },
     });
 
     if (!user) {
       throw new UnauthorizedException('Identifiants invalides');
     }
 
-    const valid = await compare(password, user.passwordHash);
+    const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) {
       throw new UnauthorizedException('Identifiants invalides');
     }
@@ -78,7 +74,7 @@ export class AuthService {
     lastName: string;
     phone?: string;
   }) {
-    const passwordHash = await hash(data.password, 12);
+    const passwordHash = await bcrypt.hash(data.password, 12);
 
     return this.prisma.user.create({
       data: {
