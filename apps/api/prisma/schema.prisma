@@ -26,7 +26,10 @@ model School {
   feeItems    FeeItem[]
   payments    Payment[]
   invoices    Invoice[]
+  receipts    Receipt[]
   admissions  Admission[]
+  attendances Attendance[]
+  grades      Grade[]
   auditLogs   AuditLog[]
 }
 
@@ -119,7 +122,7 @@ model SchoolClass {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  school School @relation(fields: [schoolId], references: [id])
+  school   School   @relation(fields: [schoolId], references: [id])
   students Student[]
 }
 
@@ -135,7 +138,7 @@ model Parent {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  school School @relation(fields: [schoolId], references: [id])
+  school   School         @relation(fields: [schoolId], references: [id])
   students ParentStudent[]
 }
 
@@ -160,6 +163,9 @@ model Student {
   admissions   Admission[]
   payments     Payment[]
   invoices     Invoice[]
+  receipts     Receipt[]
+  attendances  Attendance[]
+  grades       Grade[]
 
   @@unique([schoolId, matricule])
 }
@@ -240,6 +246,60 @@ model Payment {
   school  School  @relation(fields: [schoolId], references: [id])
   student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
   invoice Invoice? @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  receipt Receipt?
+}
+
+model Receipt {
+  id           String   @id @default(cuid())
+  schoolId     String
+  studentId    String
+  paymentId    String  @unique
+  reference    String   @unique
+  amount       Decimal  @db.Decimal(10, 2)
+  issuedAt     DateTime @default(now())
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  school  School  @relation(fields: [schoolId], references: [id])
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+}
+
+model Attendance {
+  id        String   @id @default(cuid())
+  schoolId  String
+  studentId String
+  classId   String?
+  date      DateTime
+  status    String   @default("present") // present, absent, late, justified
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  school  School      @relation(fields: [schoolId], references: [id])
+  student Student     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, date])
+}
+
+model Grade {
+  id           String   @id @default(cuid())
+  schoolId     String
+  studentId    String
+  subject      String
+  value        Decimal  @db.Decimal(5, 2)
+  weight       Int      @default(1)
+  period       String   // Trimester 1, Trimester 2, etc.
+  academicYear String   // 2024-2025
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  school  School  @relation(fields: [schoolId], references: [id])
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, subject, period, academicYear])
 }
 
 model AuditLog {
